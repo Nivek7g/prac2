@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Agregar Pregunta</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>❓ Agregar Pregunta</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="texto_pregunta" class="form-label">Texto de la Pregunta *</label>
+                        <input type="text" class="form-control" id="texto_pregunta" name="texto_pregunta" required
+                               placeholder="Ej: ¿Cómo calificaría nuestro servicio?">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tipo" class="form-label">Tipo de Pregunta *</label>
+                        <select class="form-select" id="tipo" name="tipo" required onchange="mostrarOpciones()">
+                            <option value="">Selecciona un tipo</option>
+                            <option value="texto">Texto Abierto</option>
+                            <option value="opcion">Opción Múltiple</option>
+                            <option value="escala">Escala Numérica (1-5)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="opciones-container" style="display: none;">
+                        <label for="opciones" class="form-label">Opciones (separadas por coma)</label>
+                        <input type="text" class="form-control" id="opciones" name="opciones"
+                               placeholder="Ej: Excelente, Bueno, Regular, Malo">
+                        <div class="form-text">Solo para preguntas de opción múltiple</div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">➕ Agregar Pregunta</button>
+                        <a href="{{ url_for('detalle_encuesta', id=id_encuesta) }}" class="btn btn-secondary">↩️ Volver</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mostrarOpciones() {
+            const tipo = document.getElementById('tipo').value;
+            const opcionesContainer = document.getElementById('opciones-container');
+            
+            if (tipo === 'opcion') {
+                opcionesContainer.style.display = 'block';
+            } else {
+                opcionesContainer.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
