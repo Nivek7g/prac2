@@ -5,13 +5,18 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'clave_secreta_encuestas'
 
+# Función para obtener conexión a la BD
+def get_db_connection():
+    conn = sqlite3.connect('encuestas.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
-
+# Función de inicialización de la base de datos
 def crear_base_datos():
     conn = sqlite3.connect('encuestas.db')
-    print("Base de datos encuestas.db creada")
+    print("Base de datos encuestas.db creada/conectada")
     
-    
+    # Tabla encuestas
     conn.execute('''
         CREATE TABLE IF NOT EXISTS encuestas(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,13 +68,19 @@ def crear_base_datos():
     
     conn.commit()
     conn.close()
-    print("Tablas creadas exitosamente")
+    print("Tablas creadas y datos iniciales insertados exitosamente")
 
-# Función para obtener conexión a la BD
-def get_db_connection():
-    conn = sqlite3.connect('encuestas.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+
+# ==============================================================
+# INICIALIZACIÓN DE LA BASE DE DATOS (EJECUTAR EN RENDER/PRODUCCIÓN)
+# ==============================================================
+try:
+    crear_base_datos()
+except Exception as e:
+    # Esto es útil si tienes errores de permisos en Render
+    print(f"Error al inicializar la base de datos: {e}")
+# ==============================================================
+
 
 # ==================== RUTAS PRINCIPALES ====================
 
@@ -108,7 +119,7 @@ def crear_encuesta():
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('INSERT INTO encuestas (titulo, descripcion) VALUES (?, ?)',
-                      (titulo, descripcion))
+                       (titulo, descripcion))
         encuesta_id = cursor.lastrowid
         conn.commit()
         conn.close()
@@ -237,9 +248,9 @@ def resultados_encuesta(id):
     print("Estadísticas:", estadisticas)
     
     return render_template('reportes/resultados.html', 
-                         encuesta=encuesta, 
-                         preguntas=preguntas, 
-                         estadisticas=estadisticas)
+                           encuesta=encuesta, 
+                           preguntas=preguntas, 
+                           estadisticas=estadisticas)
 # ==================== API PARA GRÁFICOS ====================
 
 
@@ -268,7 +279,6 @@ def datos_grafico(id):
 # ==================== INICIALIZACIÓN ====================
 
 if __name__ == "__main__":
-    # Crear base de datos al iniciar
-    crear_base_datos()
+    # La inicialización ya se hizo arriba.
     print("Servidor iniciado en http://localhost:5000")
     app.run(debug=True)
